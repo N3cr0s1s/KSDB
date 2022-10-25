@@ -1,0 +1,25 @@
+{
+  "and": [
+    {
+      "type": "> | >= | = | <= | <",
+      "field": "age",
+      "value": "25"
+    },
+    {
+      "type": "=",
+      "field": "id",
+      "value": "levente"
+    },
+    {
+      "type": "=",
+      "field": "id",
+      "value": "levente",
+      "or": {
+        "type": "=",
+        "field": "id",
+        "value": "Lexan"
+      }
+    }
+  ]
+}
+
