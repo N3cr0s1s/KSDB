@@ -3,6 +3,9 @@ package me.necrosis.surrealdb.framework.util.mapper.util
 import org.json.JSONObject
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import kotlin.reflect.cast
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.safeCast
 
 object TypeChecker {
 
@@ -12,11 +15,15 @@ object TypeChecker {
      * @param fieldName Field name
      * @param json      [JSONObject] from get type
      */
-    fun <T : Any> getType(clazz: KClass<T>, fieldName: String, json: JSONObject) : T? {
+    fun <T : Any> getType(
+        clazz: KClass<T>,
+        fieldName: String,
+        json: JSONObject
+    ) : Any? {
         val value = json.get(fieldName) ?: return null
         if (value::class.qualifiedName.equals(clazz.qualifiedName))
             return value as T
-        throw RuntimeException("Something went wrong, can't cast \"${value::class.qualifiedName}\"::\"${value}\" to ${clazz.qualifiedName}")
+        return value
     }
 
 

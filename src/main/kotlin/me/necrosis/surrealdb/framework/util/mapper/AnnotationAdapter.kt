@@ -14,7 +14,8 @@ open class AnnotationAdapter protected constructor(){
             AnnotationAdapterPair(Random::class,RandomAdapter()),
             AnnotationAdapterPair(Id::class,IdAdapter()),
             AnnotationAdapterPair(Crypto::class,CryptoAdapter()),
-            AnnotationAdapterPair(Session::class,SessionAdapter())
+            AnnotationAdapterPair(Session::class,SessionAdapter()),
+            AnnotationAdapterPair(Math::class,MathAdapter())
         )
 
         /**

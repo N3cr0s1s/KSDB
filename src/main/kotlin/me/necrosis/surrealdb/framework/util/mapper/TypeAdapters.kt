@@ -3,15 +3,16 @@ package me.necrosis.surrealdb.framework.util.mapper
 import me.necrosis.surrealdb.framework.KSDB
 import me.necrosis.surrealdb.framework.component.table.Table
 import me.necrosis.surrealdb.framework.util.mapper.util.TypeChecker
+import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaField
-import kotlin.reflect.jvm.kotlinProperty
 
 class DefaultAdapter : ITypeAdapter {
 
@@ -48,6 +49,7 @@ class DefaultAdapter : ITypeAdapter {
 
     override fun read(field: Field, fieldObject: Any, KSDB: KSDB, result: JSONObject) {
         val fieldType = field.type
+        field.isAccessible = true
 
         /**
          * RELATIONS
@@ -69,7 +71,6 @@ class DefaultAdapter : ITypeAdapter {
             field.set(fieldObject, relationResult)
             return
         }
-
         field.set(fieldObject,result.get(field.name))
 
     }
@@ -90,4 +91,28 @@ class BaseAdapter<T: Any>(private val type : KClass<out T>) : ITypeAdapter{
         field.set(fieldObject,TypeChecker.getType(type,field.name,result))
     }
 
+}
+
+class ArrayAdapter: ITypeAdapter{
+
+    override fun write(field: KProperty1<out Any, *>, fieldObject: Any, KSDB: KSDB, mappedObject: JSONObject) {
+        field.isAccessible = true
+        val array:Array<*> = field.getter.call(fieldObject) as Array<*>
+        val jsonArray = JSONArray()
+        array.forEach { jsonArray.put(it) }
+        mappedObject.put(field.name,jsonArray)
+    }
+
+    override fun read(field: Field, fieldObject: Any, KSDB: KSDB, result: JSONObject) {
+        val array = result.getJSONArray(field.name)
+        val compType = field.type.componentType
+        val newArray = java.lang.reflect.Array.newInstance(compType,array.length())
+        for(i in 0 until array.length())
+            java.lang.reflect.Array.set(newArray,i,array[i])
+        val kField = fieldObject::class.declaredMemberProperties.find { it.name == field.name }
+        kField?.isAccessible = true
+        kField.takeIf { it is KMutableProperty<*> }
+            ?.let { it as KMutableProperty<*> }
+            ?.setter?.call(fieldObject,newArray)
+    }
 }

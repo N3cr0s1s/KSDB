@@ -66,6 +66,7 @@
       * [🔐 Crypto](#-crypto)
       * [🔣 Random](#-random)
       * [⚡ Session](#-session)
+      * [🧮 Math](#-math)
     * [🗺️ Mapper](#-mapper)
   * [🧭 Todos](#-todos)
   * [👋 Contributing](#-contributing)
@@ -371,6 +372,46 @@ This annotation set the field value, to selected session.
 - **NS** - Returns the currently selected namespace
 - **ORIGIN** - Returns the current user's HTTP origin
 - **SC** - Returns the current user's authentication scope
+
+#### 🧮 Math
+
+Math annotation allows to run math functions, even if the function require an array.
+This annotation has two type of query
+
+- **Default**
+- **ARR_**
+
+If MathType starts with a `ARR_`, then `arrayFieldName` field is required.
+If MathTye is `FIXED`, then `fixed` field is required.
+<br><br>
+All the SurrealDB Math function is implemented, see the <a href="https://surrealdb.com/docs/surrealql/functions/math">MATH function documentation</a>.
+
+- **ABS** 	Returns the absolute value of a number
+- **CEIL**  Rounds a number up to the next largest integer
+- **FIXED** Returns a number with the specified number of decimal places
+- **FLOOR** Rounds a number down to the next largest integer
+- **ARR_MAX** Returns the maximum number in a set of numbers
+- **ARR_MEAN** Returns the mean of a set of numbers
+- **ARR_MEDIAN** Returns the median of a set of numbers
+- **ARR_MIN** Returns the minimum number in a set of numbers
+- **ARR_PRODUCT** Returns the product of a set of numbers
+- **ROUND** Rounds a number up or down to the nearest integer
+- **SQRT** Returns the square root of a number
+- **ARR_SUM** Returns the total sum of a set of numbers
+
+> **Warning**
+> If you use the array function, make sure to use the same object type for the output field as the generic type of the array.
+> Like this
+> ```kotlin
+>    var math: Array<Int>? = null
+> 
+>    @Math(MathType.ARR_MAX, arrayFieldName = "math")
+>    var mathArrayMax: Int? = null
+> 
+>    @Math(MathType.ARR_MIN, arrayFieldName = "math")
+>    var mathArrayMin: Int? = null
+> ```
+> In this case, you can't use `Double` field on `mathArrayMax` or `mathArrayMin` field, only `Int`, like the array type.
 
 ### 🗺️ Mapper
 

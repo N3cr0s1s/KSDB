@@ -15,12 +15,13 @@ open class TypeAdapter protected constructor() {
     companion object {
 
         private val adapters:List<TypeAdapterPair> = listOf(
-            TypeAdapterPair(String::class,BaseAdapter(String::class)),
-            TypeAdapterPair(Double::class,BaseAdapter(Double::class)),
-            TypeAdapterPair(Boolean::class,BaseAdapter(Boolean::class)),
-            TypeAdapterPair(Float::class,BaseAdapter(Float::class)),
-            TypeAdapterPair(Int::class,BaseAdapter(Int::class)),
-            TypeAdapterPair(Number::class,BaseAdapter(Number::class))
+            TypeAdapterPair(    String::class,  BaseAdapter(String::class)  ),
+            TypeAdapterPair(    Double::class,  BaseAdapter(Double::class)  ),
+            TypeAdapterPair(    Boolean::class, BaseAdapter(Boolean::class) ),
+            TypeAdapterPair(    Float::class,   BaseAdapter(Float::class)   ),
+            TypeAdapterPair(    Int::class,     BaseAdapter(Int::class)     ),
+            TypeAdapterPair(    Number::class,  BaseAdapter(Number::class)  ),
+            TypeAdapterPair(    Array::class,   ArrayAdapter()  ),
         )
 
         /**
@@ -30,7 +31,11 @@ open class TypeAdapter protected constructor() {
          */
         fun getAdapter(clazz: KClass<*>) : ITypeAdapter {
             adapters.forEach {
-                if(it.clazz == clazz)
+                if (it.clazz.java.simpleName.equals(clazz.java.simpleName))
+                    return it.adapter
+                if (it.clazz == clazz)
+                    return it.adapter
+                if(it.clazz.qualifiedName == clazz.qualifiedName)
                     return it.adapter
                 return@forEach
             }

@@ -3,6 +3,21 @@ package me.necrosis.surrealdbtest.framework
 import me.necrosis.surrealdb.framework.component.*
 import me.necrosis.surrealdb.framework.component.table.Table
 
+@Table("mathTable")
+data class MathTest(
+
+    var math: Array<Int>? = null,
+    @Math(MathType.ARR_MAX, arrayFieldName = "math")
+    var mathArrayMax: Int? = null,
+    @Math(MathType.ARR_MIN, arrayFieldName = "math")
+    var mathArrayMin: Int? = null,
+    @Random(RandomType.RSTRING, min = 10.0, max = 50.0)
+    @Id
+    var id: String? = null,
+    @Math(MathType.CEIL, arrayFieldName = "math")
+    var ceilValue: Double = 13.146572,
+)
+
 @Table("testTable")
 class TestTable{
 

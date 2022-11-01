@@ -61,7 +61,8 @@ class TableHandler<T: Any>(
         if(!idMatch.matches(finalId))
             finalId = "⟨$finalId⟩"
         KSDB.getSurrealDB().select(Record(table.tableName,finalId)).get { jsonArray ->
-            this.objectMapper.unmapObject(type,jsonArray!!,{list ->
+            if (jsonArray?.length()!! < 1) future.complete(null)
+            this.objectMapper.unmapObject(type,jsonArray,{list ->
                 list.forEach{ future.complete(it) }
             })
         }

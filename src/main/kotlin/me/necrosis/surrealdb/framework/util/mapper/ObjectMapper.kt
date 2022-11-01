@@ -77,8 +77,8 @@ class ObjectMapper(val KSDB: KSDB){
             clazz.declaredFields.forEach {
                 it.isAccessible = true
                 //  Write data to field
-                TypeAdapter.getAdapter(it.type::class)
-                    .read(it,newObject,KSDB,jsonObject)
+                TypeAdapter.getAdapter(it.type.kotlin)
+                    .read(it, newObject, KSDB, jsonObject)
             }
             callBack(newObject as T)
         }

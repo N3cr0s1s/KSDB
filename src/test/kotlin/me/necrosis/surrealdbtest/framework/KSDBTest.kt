@@ -10,6 +10,7 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import java.util.*
 import kotlin.test.assertEquals
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -17,6 +18,19 @@ internal class KSDBTest {
 
     val KSDB = KSDB(SyncSurrealDB("localhost:8000","test","test", User("root","root")))
     val tableHandler = KSDB.get<TestTable>()
+
+    @Test
+    fun mathTest(){
+        val array = arrayOf(10,1,5,8,9,6,5,1,7)
+        var id = ""
+        KSDB.get<MathTest>().create(MathTest(array),wait=true){
+            id = it.getString("_id")
+        }
+        val math = KSDB.get<MathTest>().find(id).get()
+        println(array.contentToString())
+        println("Array max: ${math?.mathArrayMax} ; Array min: ${math?.mathArrayMin}")
+        println("3.14 ceil: ${math?.ceilValue}")
+    }
 
     @Test @Order(0)
     fun createTest(){
@@ -70,6 +84,7 @@ internal class KSDBTest {
     @Test @Order(4)
     fun deleteTest(){
         tableHandler.deleteTable{}
+        KSDB.get<MathTest>().deleteTable {}
     }
 
 }
