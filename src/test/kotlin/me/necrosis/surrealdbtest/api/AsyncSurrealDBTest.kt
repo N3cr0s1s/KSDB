@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 internal class AsyncSurrealDBTest {
 
     private val surrealDB = AsyncSurrealDB("localhost:8000","test","test", User("root","root"))
-    private val lock = CountDownLatch(10)
+    private val lock = CountDownLatch(1)
 
     @Order(0)
     @Test fun connectTest(){
@@ -26,7 +26,7 @@ internal class AsyncSurrealDBTest {
             assertTrue(it)
             lock.countDown()
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(1)
@@ -38,7 +38,7 @@ internal class AsyncSurrealDBTest {
                 lock.countDown()
             }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(1)
@@ -52,7 +52,7 @@ internal class AsyncSurrealDBTest {
                 lock.countDown()
             }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(1)
@@ -67,7 +67,7 @@ internal class AsyncSurrealDBTest {
                 lock.countDown()
                 }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(2)
@@ -80,7 +80,7 @@ internal class AsyncSurrealDBTest {
                 lock.countDown()
             }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(2)
@@ -94,7 +94,7 @@ internal class AsyncSurrealDBTest {
                 lock.countDown()
             }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(3)
@@ -110,7 +110,7 @@ internal class AsyncSurrealDBTest {
                 }
             }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(4)
@@ -126,19 +126,24 @@ internal class AsyncSurrealDBTest {
                 }
             }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(5)
     @Test fun deleteRecord(){
-        surrealDB.connect().get {
-            assertTrue(it)
-            surrealDB.delete(Record("testTable","testID")).get {
-                assertTrue(it?.isEmpty!!)
-                lock.countDown()
+        surrealDB.connect().get { isConnected ->
+            assertTrue(isConnected)
+
+            val record = Record("testTable","testID")
+            surrealDB.delete(record).get { deleteResult ->
+                assertTrue(!deleteResult?.isEmpty!!)
+                surrealDB.select(record).get { selectResult ->
+                    assertTrue(selectResult?.isEmpty!!)
+                    lock.countDown()
+                }
             }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
     @Order(6)
@@ -150,7 +155,7 @@ internal class AsyncSurrealDBTest {
                 lock.countDown()
             }
         }
-        lock.await(500, TimeUnit.MILLISECONDS)
+        assertTrue(lock.await(5000, TimeUnit.MILLISECONDS))
     }
 
 }
